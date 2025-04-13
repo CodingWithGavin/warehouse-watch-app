@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-warehousewatchapp-dev-e981f-authRole",
+      "UnauthRoleArn": "arn:aws:iam::559050238744:role/amplify-warehousewatchapp-dev-e981f-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::559050238744:role/amplify-warehousewatchapp-dev-e981f-authRole",
+      "Region": "eu-west-1",
+      "DeploymentBucketName": "amplify-warehousewatchapp-dev-e981f-deployment",
+      "UnauthRoleName": "amplify-warehousewatchapp-dev-e981f-unauthRole",
+      "StackName": "amplify-warehousewatchapp-dev-e981f",
+      "StackId": "arn:aws:cloudformation:eu-west-1:559050238744:stack/amplify-warehousewatchapp-dev-e981f/acd17ca0-1891-11f0-8fd4-0a40da4d5b79",
+      "AmplifyAppId": "d1mj3k8jp6g6bp"
+    },
+    "categories": {
+      "auth": {
+        "warehousewatchapp962824c6": {}
+      }
+    }
+  }
+}
