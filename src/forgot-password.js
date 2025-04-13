@@ -1,9 +1,5 @@
-import { Amplify } from 'aws-amplify';
-import { Auth } from 'aws-amplify';
-import awsExports from './aws-exports.js';
 
-Amplify.configure(awsExports);
-
+Amplify.configure(window.awsconfig);
 const forgotForm = document.getElementById('forgotPasswordForm');
 const confirmForm = document.getElementById('confirmResetForm');
 

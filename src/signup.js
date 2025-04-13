@@ -1,28 +1,28 @@
-import { Amplify } from 'aws-amplify';
-import { Auth } from 'aws-amplify';
-import awsExports from './aws-exports.js';
+// signup.js
 
-Amplify.configure(awsExports);
+// Configure Amplify (only once per page)
+Amplify.configure(window.awsconfig);
 
-document.getElementById('signupForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
+document.getElementById('signupForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
 
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-  const email = document.getElementById('email').value;
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
 
-  try {
-    await Auth.signUp({
-      username,
-      password,
-      attributes: { email }
-    });
-
-    alert('Sign up successful! Please check your email for confirmation code.');
-    // Redirect to login or confirmation screen
-    window.location.href = 'index.html';
-  } catch (error) {
-    console.error('Signup failed', error);
-    alert('Signup failed: ' + error.message);
-  }
+    try {
+        const { user } = await Auth.signUp({
+            username,
+            password,
+            attributes: {
+                email,
+            }
+        });
+        alert('Sign-up successful! Please check your email to confirm.');
+        console.log(user);
+        window.location.href = 'index.html';
+    } catch (error) {
+        console.error('Sign-up error', error);
+        alert('Sign-up failed: ' + error.message);
+    }
 });
