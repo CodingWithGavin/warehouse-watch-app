@@ -1,5 +1,3 @@
-import { Amplify } from 'aws-amplify';
-import { Auth } from 'aws-amplify';
 import awsExports from './aws-exports.js';
 
 Amplify.configure(awsExports);
@@ -11,7 +9,6 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     const password = document.getElementById('password').value;
   
     console.log("Login clicked!", username, password);
-
 
     try {
       const user = await Auth.signIn(username, password);
