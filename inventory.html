@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Warehouse Inventory</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">Warehouse App</a>
+            <div class="collapse navbar-collapse justify-content-end">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="inventory.html">Inventory</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+  <div class="container mt-5">
+    <h2 class="text-center mb-4">Current Warehouse Inventory</h2>
+    <table class="table table-bordered" id="inventoryTable">
+      <thead class="table-light">
+        <tr>
+          <th>Item ID</th>
+          <th>Item Name</th>
+          <th>Description</th>
+          <th>SKU</th>
+          <th>Quantity</th>
+          <th>Location</th>
+          <th>Manufacturer</th>
+          <th>Category</th>
+          <th>Edit | Delete</th>
+        </tr>
+      </thead>
+      <tbody  id="inventory-body">
+              
+      </tbody>
+    </table>
+  </div>
+    
+  <div class="modal fade" id="editItemModal" tabindex="-1" aria-labelledby="editItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <form id="editItemForm" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editItemModalLabel">Edit Item</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Hidden field stores our itemId -->
+          <input type="hidden" id="editItemId">
+          
+          <div class="mb-3">
+            <label for="editItemName" class="form-label">Item Name</label>
+            <input type="text" class="form-control" id="editItemName" required>
+          </div>
+          <div class="mb-3">
+            <label for="editDescription" class="form-label">Description</label>
+            <input type="text" class="form-control" id="editDescription">
+          </div>
+          <div class="mb-3">
+            <label for="editSku" class="form-label">SKU</label>
+            <input type="text" class="form-control" id="editSku">
+          </div>
+          <div class="mb-3">
+            <label for="editQuantity" class="form-label">Quantity</label>
+            <input type="number" class="form-control" id="editQuantity">
+          </div>
+          <div class="mb-3">
+            <label for="editLocation" class="form-label">Location</label>
+            <input type="text" class="form-control" id="editLocation">
+          </div>
+          <div class="mb-3">
+            <label for="editManufacturer" class="form-label">Manufacturer</label>
+            <input type="text" class="form-control" id="editManufacturer">
+          </div>
+          <div class="mb-3">
+            <label for="editCategory" class="form-label">Category</label>
+            <input type="text" class="form-control" id="editCategory">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Add Inventory Item</h2>
+    <form id="addInventoryForm" onsubmit="addItemToInventory(event)">
+      <div class="form-group">
+        <label for="itemName">Item Name</label>
+        <input type="text" class="form-control" id="itemName" required>
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <input type="text" class="form-control" id="description" required>
+      </div>
+      <div class="form-group">
+        <label for="sku">SKU</label>
+        <input type="text" class="form-control" id="sku" required>
+      </div>
+      <div class="form-group">
+        <label for="quantity">Quantity</label>
+        <input type="number" class="form-control" id="quantity" required>
+      </div>
+      <div class="form-group">
+        <label for="location">Location</label>
+        <input type="text" class="form-control" id="location" required>
+      </div>
+      <div class="form-group">
+        <label for="manufacturer">Manufacturer</label>
+        <input type="text" class="form-control" id="manufacturer" required>
+      </div>
+      <div>
+        <label for="category">Category</label>
+        <input type="text" class="form-control" id="category" required/>
+      </div>
+      <button type="button" onclick="addItem()" class="btn btn-primary">Add Item</button>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/aws-sdk@2.1312.0/dist/aws-sdk.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js@5.2.6/dist/amazon-cognito-identity.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script src="src/config.js"></script>
+  <script src="src/inventory.js"></script>
+  <script src="src/auth.js"></script>
+</body>
+</html>
