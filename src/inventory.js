@@ -1,4 +1,6 @@
 // Global fetchInventory function
+let allInventoryItems = [];
+
 async function fetchInventory() {
   const inventoryTable = document.getElementById('inventory-body');
   const token = localStorage.getItem("accessToken");
@@ -16,7 +18,8 @@ async function fetchInventory() {
       throw new Error('Network response was not ok');
     }
 
-    const items = await response.json(); // <-- use response directly
+    const items = await response.json();
+    allInventoryItems = items;
     populateTable(items);
 
   } catch (error) {
@@ -24,6 +27,8 @@ async function fetchInventory() {
     inventoryTable.innerHTML = `<tr><td colspan="5" class="text-danger">Failed to load inventory</td></tr>`;
   }
 }
+
+document.getElementById('refreshButton').addEventListener('click', fetchInventory);
 
 // Function to populate table with inventory data
 function populateTable(items) {
@@ -37,6 +42,16 @@ function populateTable(items) {
 
   items.forEach(item => {
     const row = document.createElement('tr');
+
+    if(item.quantity <= 20){
+      row.classList.add("table-danger");
+
+    }
+    else if(item.quantity <= 50)
+    {
+      row.classList.add("table-warning");
+    }
+
     row.innerHTML = `
       <td>${item.itemId || '—'}</td>
       <td>${item.itemName || '—'}</td>
@@ -65,21 +80,53 @@ function populateTable(items) {
   });
 }
 
+//Filter our table according to the search bar
+function filterInventory() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  
+
+  const filtered = allInventoryItems.filter(item => {
+    const matchesSearch =
+      item.itemId.toLowerCase().includes(search) ||
+      item.itemName.toLowerCase().includes(search) ||
+      item.description.toLowerCase().includes(search) ||
+      item.sku.toLowerCase().includes(search) ||
+      item.location.toLowerCase().includes(search) ||
+      item.manufacturer.toLowerCase().includes(search);
+
+    return matchesSearch ;
+  });
+
+  populateTable(filtered);
+}
+document.getElementById('searchInput').addEventListener('input', filterInventory);
+
 // Fetch inventory when page is loaded
 document.addEventListener('DOMContentLoaded', () => {
   fetchInventory();
 });
 
+
 // Add Item
-async function addItem() {
-  // Get item data from the form
+async function addItemToInventory(event) {
+  event.preventDefault(); // Prevent page reload on form submit
+
+  const form = document.getElementById('addInventoryForm');
+
+  if (!form.checkValidity()) {
+    form.reportValidity(); // Show native browser validation
+    return;
+  }
+
   const itemName = document.getElementById('itemName').value;
   const description = document.getElementById('description').value;
   const sku = document.getElementById('sku').value;
-  const quantity = document.getElementById('quantity').value;
+  const quantity = parseInt(document.getElementById('quantity').value);
   const location = document.getElementById('location').value;
   const manufacturer = document.getElementById('manufacturer').value;
   const category = document.getElementById('category').value;
+
+
 
   const item = {
     itemName,
@@ -110,18 +157,14 @@ async function addItem() {
 
     const data = await response.json();
     
-    // Clear the form after adding the item
-    document.getElementById('itemName').value = '';
-    document.getElementById('description').value = '';
-    document.getElementById('sku').value = '';
-    document.getElementById('quantity').value = '';
-    document.getElementById('location').value = '';
-    document.getElementById('manufacturer').value = '';
-    document.getElementById('category').value = '';
+    
 
     if (response.status === 200) {
       alert('Item added successfully!');
       fetchInventory(); // Refresh inventory list
+      const collapseElement = document.getElementById('addInventoryCollapse');
+      const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseElement);
+      bsCollapse.hide();
     } else {
       alert('Error adding item');
       console.error(data);
@@ -130,6 +173,9 @@ async function addItem() {
     console.error('Error:', error);
     alert('An error occurred while adding the item');
   }
+
+  // Clear form
+    form.reset();
 }
 
 function openEditForm(item) {
@@ -183,6 +229,8 @@ document.getElementById('editItemForm').addEventListener('submit', async (e) => 
   } catch (err) {
     console.error('Update error:', err);
     alert('Failed to update item.');
+    // Refresh inventory list
+    fetchInventory();
   }
 });
 

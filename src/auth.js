@@ -34,6 +34,7 @@ function login(event) {
       localStorage.setItem("username", username); 
 
       console.log("Access Token:", localStorage.getItem("accessToken"));
+      console.log("Username: ", localStorage.getItem("username")); 
       alert('Login Successful');
       window.location.href = "inventory.html";
     },
@@ -175,3 +176,10 @@ function resetPassword(event) {
     }
   });
 }
+
+//Personlise The Title 
+ 
+document.addEventListener("DOMContentLoaded", function () {
+  const username = localStorage.getItem("username");
+  document.getElementById('navbarTitle').innerText = `Warehouse App - Welcome ${username}`;
+});
