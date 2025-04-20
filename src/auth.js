@@ -52,13 +52,13 @@ function login(event) {
 
 //Logout
 function logout() {
-  // Clear all auth data
+  // Clear all auth data from our local storage so its not kept after a user logs out
   localStorage.removeItem("accessToken");
   localStorage.removeItem("idToken");
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("username");
 
-  // Redirect to login page
+  // Redirect to login page so the user can log back in if needed
   window.location.href = "index.html";
 }
 
@@ -76,6 +76,7 @@ function signUp(event) {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
 
+  //this is to be used to send our verification email 
   const attributeList = [
     new AmazonCognitoIdentity.CognitoUserAttribute({
       Name: 'email',
@@ -83,26 +84,29 @@ function signUp(event) {
     })
   ];
 
+  //here we set up the users account in cognito 
   userPool.signUp(username, password, attributeList, null, function(err, result) {
     if (err) {
       alert(err.message || JSON.stringify(err));
       return;
     }
     alert('Sign-up successful. Please verify your email.');
-    // ✅ Save email (username) to localStorage
+    // Save email (username) to localStorage
     localStorage.setItem("username", username);
 
-    // ✅ Redirect to verify email page
+    // Redirect to verify email page so the account can be verified
     window.location.href = "verify-email.html";
   });
 }
 
 // FORGOT PASSWORD
 function forgotPassword(event) {
+  //stops the page from auto reloading
   event.preventDefault();
 
   const username = document.getElementById('username').value;
 
+  //collects the needed data to create a cognito user instance
   const userData = {
     Username: username,
     Pool: userPool,
@@ -110,6 +114,7 @@ function forgotPassword(event) {
 
   const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
 
+  //uses cognitos forgotpassword function to send on the password reset verification
   cognitoUser.forgotPassword({
     onSuccess: function(data) {
       alert('Password reset request successful. Check your email.');
@@ -124,10 +129,11 @@ function forgotPassword(event) {
 
 // Verify Page
 function verifyEmail(event) {
+  //stops the page from auto reloading
   event.preventDefault();
 
   const verificationCode = document.getElementById('verificationCode').value;
-  const username = localStorage.getItem("username"); // Get saved email
+  const username = localStorage.getItem("username"); // Get saved email from our local storage
 
   if (!username) {
     alert("No email found. Please sign up again.");
@@ -152,8 +158,9 @@ function verifyEmail(event) {
   });
 }
 
-//Reset Page
+//Reset password function
 function resetPassword(event) {
+  //stops the page from auto reloading
   event.preventDefault();
 
   const verificationCode = document.getElementById('verificationCode').value;

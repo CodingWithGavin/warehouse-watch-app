@@ -1,4 +1,4 @@
-let allShipmentItems = [];
+let allShipmentItems = []; 
 let selectedItems = []; // Array to keep track of selected items for the shipment
 
 // Fetch inventory items and populate the table
@@ -6,6 +6,7 @@ async function fetchInventory() {
   const inventoryTable = document.getElementById('inventory-body');
   const token = localStorage.getItem("accessToken");
 
+  //we use the get route to get all the inventory item information to allow us to poplate our item selection
   try {
     const response = await fetch('https://layipqsy0l.execute-api.eu-west-1.amazonaws.com/dev/inventory', {
       method: 'GET',
@@ -39,6 +40,7 @@ function populateTable(items) {
       return;
     }
   
+    //we are only getting certain information not everything, populating the row if there is info or leaving placeholders if there isn't
     items.forEach(item => {
       const row = document.createElement('tr');
       row.innerHTML = `
@@ -53,6 +55,7 @@ function populateTable(items) {
     });
   }
 
+  //this function gets the items we select and then the quantity of said item and then adds to our chosen item list
   function handleRowSelection(item) {
     const existingIndex = selectedItems.findIndex(i => i.itemId === item.itemId);
   
@@ -61,16 +64,16 @@ function populateTable(items) {
       const current = selectedItems[existingIndex];
       const newQuantity = prompt(`"${item.itemName}" is already selected with quantity ${current.quantity}.\nEnter a new quantity (or 0 to remove):`);
   
-      if (newQuantity === null) return; // User cancelled
+      if (newQuantity === null) return; // User cancelleds item by entering 0
   
       const parsedQuantity = parseInt(newQuantity, 10);
   
       if (isNaN(parsedQuantity) || parsedQuantity < 0) {
-        alert('Please enter a valid positive number or 0 to remove the item.');
+        alert('Please enter a valid positive number or 0 to remove the item.'); //if we enter a negative it gives the appropriate response
       } else if (parsedQuantity === 0) {
-        selectedItems.splice(existingIndex, 1); // Remove item
+        selectedItems.splice(existingIndex, 1); // Removes item
       } else {
-        selectedItems[existingIndex].quantity = parsedQuantity; // Update quantity
+        selectedItems[existingIndex].quantity = parsedQuantity; // Updates the quantity of the seelcted item
       }
   
     } else {
@@ -114,6 +117,8 @@ function populateTable(items) {
     }
   }
 
+  //This function gathers all the information from our shipment form including other information like our workername based on the localstorage username and the time and 
+  //then creates a shipment to add to the shipments database
   async function addToShipment() {
     const token = localStorage.getItem("accessToken");
     const workername = localStorage.getItem("username");
@@ -164,6 +169,7 @@ function populateTable(items) {
       console.log("Shipment response:", data);
   
       if (response.status === 200) {
+        //if successful we geenrate a pdf of the shipment order
         generateShipmentPDF();
         alert('Shipment created successfully!');
         selectedItems = [];
@@ -181,7 +187,7 @@ function populateTable(items) {
   }
   
   
-
+//uses the similar filter function from the inventory list to allow us to search for sepecific items
 function filteritems() {
     const search = document.getElementById('searchInput').value.toLowerCase();
   
@@ -221,11 +227,11 @@ async function generateShipmentPDF() {
     const recipientCompany = document.getElementById('recipientCompany').value.trim();
     const orderAddress = document.getElementById('recipientAddress').value.trim();
   
-    // Title
+    // Title of the pdf
     doc.setFontSize(18);
     doc.text("Shipment Summary", 20, 20);
   
-    // Basic Info
+    // Basic Info in the main part of the pdf
     doc.setFontSize(12);
     doc.text(`Date:  ${date.toLocaleDateString()}`, 20, 25)
     doc.text(`Worker: ${workername}`, 20, 35);
@@ -259,20 +265,22 @@ async function generateShipmentPDF() {
     // Save PDF
     doc.save("shipment-summary.pdf");
 
-    // Step 1: Generate the PDF as a Blob
+    //This next part goes through submitting the generated pdf file to our S3 bucket for added safekeeping
+    // Generate the PDF as a Blob
   const pdfBlob = doc.output("blob");
 
-    // Step 2: Get pre-signed URL from your backend
+    //  Get pre-signed URL from your backend, this is needed in order to submit the file to the s3 bucket
 
-    //printable/readable timestamp for our pdf view 
+    //printable/readable timestamp for our pdfs name
     const now = new Date();
     const dateformat = now.toISOString().split('T')[0];
     const timeformat = now.toISOString().split('T')[1].split('.')[0].replace(/:/g, '-'); 
     const formated = `${dateformat} | ${timeformat}`;
 
-    const filename = `shipment-${formated}-${workername}.pdf`;
+    const filename = `shipment-${formated}-${workername}.pdf`; //makes the pdf name the date it was made and the worker who made it 
     const token = localStorage.getItem("idToken"); // only needed if your API Gateway route is protected
 
+    //Calls the route to get the lambda for the needed signed url
     const res = await fetch(`https://layipqsy0l.execute-api.eu-west-1.amazonaws.com/dev/shipments/getuploadurl?filename=${filename}`, {
     method: "GET",
     headers: {
@@ -282,7 +290,7 @@ async function generateShipmentPDF() {
     const data = await res.json();
     const uploadUrl = data.uploadUrl;
 
-    // Step 3: Upload the file to S3 using the signed PUT URL
+    // Uploads the file to S3 using the signed PUT URL
     const uploadRes = await fetch(uploadUrl, {
     method: "PUT",
     body: pdfBlob,
