@@ -1,13 +1,16 @@
-// auth.js
+// Our authentication files from cognito userpool using the information from our config file 
 const userPool = new AmazonCognitoIdentity.CognitoUserPool(cognitoConfig);
 
-// LOGIN
+// This function is used by our login page to login users to their accounts
 function login(event) {
+  //This helps stop the page from automatically reloading itself
   event.preventDefault();
 
+  //gets our users input
   const username = document.getElementById('username').value;
   const password = document.getElementById('password').value;
 
+  //creates a cognito identity for authentication with the information passed in 
   const authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
     Username: username,
     Password: password,
@@ -17,7 +20,8 @@ function login(event) {
     Username: username,
     Pool: userPool,
   };
-
+  
+  //creates a cognito user element from the userdata passed in
   const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
 
   cognitoUser.authenticateUser(authenticationDetails, {
@@ -33,11 +37,13 @@ function login(event) {
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("username", username); 
 
+      //used for troubleshooting to ensure we have our accesstokens and user info
       console.log("Access Token:", localStorage.getItem("accessToken"));
       console.log("Username: ", localStorage.getItem("username")); 
       alert('Login Successful');
       window.location.href = "inventory.html";
     },
+    //sends out our error messages 
     onFailure: function(err) {
       alert(err.message || JSON.stringify(err));
     }
